@@ -1,17 +1,33 @@
 import ballerina/http;
+import ballerina/uuid;
+
+type ToDo record {
+    string text;
+    boolean isDone;
+};
+
+type ToDoObject record {
+    *ToDo;
+    string id;
+};
+
+ToDoObject[] todoList = [{id: "1", text: "This is a sampe todo", isDone: false}];
 
 # A service representing a network-accessible API
 # bound to port `9090`.
 service / on new http:Listener(9090) {
 
-    # A resource for generating greetings
-    # + name - the input string name
-    # + return - string name with hello message or error
-    resource function get greeting(string name) returns string|error {
+    # A resource to get todo list
+    # + return - todo list which includes todo items
+    resource function get todos() returns ToDoObject[] {
         // Send a response back to the caller.
-        if name is "" {
-            return error("name should not be empty!");
-        }
-        return "Hello, " + name;
+        return todoList;
+    }
+
+    # A resource to add new todo item to todo list
+    # + return - todo list which includes todo items
+    resource function post todo(@http:Payload ToDo todoItem) returns ToDoObject[] {
+        todoList.push({id: uuid:createType1AsString(), text: todoItem.text, isDone: todoItem.isDone});
+        return todoList;
     }
 }
