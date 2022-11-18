@@ -13,17 +13,35 @@ type ToDoObject record {
   string id;
 };
 
+configurable string dbHost = ?;
+configurable string dbUser = ?;
+configurable string dbPassword = ?;
+configurable string database = ?;
+
+configurable string authIssuer = ?;
+configurable string[] authAudience = ?;
+
 function getUser(string authHeader) returns string?|error {
   [jwt:Header, jwt:Payload] [_, payload] = check jwt:decode(authHeader);
   return payload.sub;
 }
 
+function validateUser(string authHeader) returns string?|error {
+  jwt:ValidatorConfig validatorConfig = {
+    issuer: authIssuer,
+    audience: authAudience,
+    clockSkew: 60
+  };
+  jwt:Payload payload = check jwt:validate(authHeader, validatorConfig);
+  return payload.sub;
+}
+
 function getTodos(string userId) returns ToDoObject[] | error {
   mysql:Client dbClient = check new(
-    host="sql.freedb.tech",
-    user="freedb_id19870987_admin",
-    password="fgVtMvk6*mE8HjB", 
-    database="freedb_id19870987_todo",
+    host=dbHost,
+    user=dbUser,
+    password=dbPassword, 
+    database=database,
     connectionPool = { maxOpenConnections: 5 }
   );
   ToDoObject[] todoItems = [];
