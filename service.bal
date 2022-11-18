@@ -9,7 +9,7 @@ ToDoObject[] todoList = [{id: "1", text: "This is a sampe todo", isDone: false}]
 service / on new http:Listener(9090) {
     # A resource to get todo list
     # + return - todo list which includes todo items
-    resource function get todos(@http:Header {name: "Authorization"} string authHeader) returns ToDoObject[] | error {
+    resource function get todos(@http:Header {name: "x-authorization"} string authHeader) returns ToDoObject[] | error {
         string?|error user = getUser(authHeader);
         if (user is string) {
             log:printInfo(string `User ${user} is accessing the function GET todos.`);
