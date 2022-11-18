@@ -1,7 +1,6 @@
 import ballerina/http;
 import ballerinax/mysql.driver as _;
 import ballerina/log;
-import ballerina/uuid;
 
 ToDoObject[] todoList = [{id: "1", text: "This is a sampe todo", isDone: false}];
 
@@ -11,8 +10,6 @@ ToDoObject[] todoList = [{id: "1", text: "This is a sampe todo", isDone: false}]
     cors: {
         allowOrigins: ["*"],
         allowCredentials: false,
-        allowHeaders: ["accept", "Content-Type", "API-Key"],
-        exposeHeaders: ["X-CUSTOM-HEADER"],
         maxAge: 84900
     }
 }
@@ -37,29 +34,5 @@ service / on new http:Listener(9090) {
             return addTodoItem(todoItem, user);
         }
         return error("Cannot retrieve user");
-    }
-
-    # A resource to get todo list
-    # + return - todo list which includes todo items
-    resource function get todosv2() returns ToDoObject[] | error {
-        return getTodosV2();
-    }
-
-    # A resource to add new todo item to todo list
-    # + return - todo list which includes todo items
-    resource function post todov2(@http:Payload ToDo todoItem) returns ToDoObject[]|error {
-        return addTodoItemV2(todoItem);
-    }
-
-    # A resource to get todo list
-    # + return - todo list which includes todo items
-    resource function get todosv1() returns ToDoObject[] {
-        // Send a response back to the caller.
-        return todoList;
-    }
-
-    resource function post todov1(@http:Payload ToDo todoItem) returns ToDoObject[] {
-        todoList.push({id: uuid:createType1AsString(), text: todoItem.text, isDone: todoItem.isDone});
-        return todoList;
     }
 }
