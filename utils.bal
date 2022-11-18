@@ -15,7 +15,7 @@ type ToDoObject record {
 mysql:Client dbClient = check new(
   host="db4free.net",
   user="id19870987_admin",
-  password="*D#{5H!@)JV#AdY0", 
+  password="91a35005", 
   database="id19870987_todo"
 );
 
