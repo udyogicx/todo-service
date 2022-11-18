@@ -6,13 +6,6 @@ ToDoObject[] todoList = [{id: "1", text: "This is a sampe todo", isDone: false}]
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-@http:ServiceConfig {
-    cors: {
-        allowOrigins: ["*"],
-        allowCredentials: false,
-        maxAge: 84900
-    }
-}
 service / on new http:Listener(9090) {
     # A resource to get todo list
     # + return - todo list which includes todo items
