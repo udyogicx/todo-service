@@ -16,7 +16,7 @@ service / on new http:Listener(9090) {
             log:printInfo(string `User ${user} is accessing the function GET todos.`);
             return getTodos(user);
         }
-        return error("Cannot retrieve user", user);
+        return error("Cannot retrieve user, error: ", user);
     }
 
     # A resource to add new todo item to todo list
@@ -27,7 +27,7 @@ service / on new http:Listener(9090) {
             log:printInfo(string `User ${user} is accessing the function POST todo.`);
             return addTodoItem(todoItem, user);
         }
-        return error("Cannot retrieve user", user);
+        return error("Cannot retrieve user, error: ", user);
     }
 
     # A resource to get todo list
@@ -38,7 +38,7 @@ service / on new http:Listener(9090) {
             log:printInfo(string `User ${user} is accessing the function GET todos.`);
             return getTodos(user);
         }
-        return error("Cannot retrieve user", user);
+        return error("Cannot retrieve user, error: ", user);
     }
 
     # A resource to add new todo item to todo list
@@ -49,7 +49,7 @@ service / on new http:Listener(9090) {
             log:printInfo(string `User ${user} is accessing the function POST todo.`);
             return addTodoItem(todoItem, user);
         }
-        return error("Cannot retrieve user", user);
+        return error("Cannot retrieve user, error: ", user);
     }
 
     # A resource to get todo list
