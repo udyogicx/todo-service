@@ -13,11 +13,19 @@ type ToDoObject record {
 };
 
 mysql:Client dbClient = check new(
-  host="db4free.net",
-  user="id19870987_admin",
-  password="91a35005", 
-  database="id19870987_todo"
+  host="sql.freedb.tech",
+  user="freedb_id19870987_admin",
+  password="fgVtMvk6*mE8HjB", 
+  database="freedb_id19870987_todo",
+  connectionPool = { maxOpenConnections: 5 }
 );
+
+function closeDBClient() returns error? {
+  sql:Error? close = dbClient.close();
+  if close is sql:Error {
+    return error("Unable to close db client");
+  }
+}
 
 function getTodos() returns ToDoObject[] | error {
   ToDoObject[] todoItems = [];
