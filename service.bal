@@ -1,7 +1,5 @@
 import ballerina/http;
 import ballerinax/mysql.driver as _;
-import ballerina/log;
-import ballerina/uuid;
 
 ToDoObject[] todoList = [{id: "1", text: "This is a sampe todo", isDone: false}];
 
@@ -19,47 +17,13 @@ ToDoObject[] todoList = [{id: "1", text: "This is a sampe todo", isDone: false}]
 service / on new http:Listener(9090) {
     # A resource to get todo list
     # + return - todo list which includes todo items
-    resource function get todos(@http:Header {name: "Authorization"} string authHeader) returns ToDoObject[] | error {
-        string?|error user = getUser(authHeader);
-        if (user is string) {
-            log:printInfo(string `User ${user} is accessing the function GET todos.`);
-            return getTodos(user);
-        }
-        return error("Cannot retrieve user");
+    resource function get todos() returns ToDoObject[] | error {
+        return getTodos();
     }
 
     # A resource to add new todo item to todo list
     # + return - todo list which includes todo items
-    resource function post todo(@http:Payload ToDo todoItem, @http:Header {name: "Authorization"} string authHeader) returns ToDoObject[]|error {
-        string?|error user = getUser(authHeader);
-        if (user is string) {
-            log:printInfo(string `User ${user} is accessing the function POST todo.`);
-            return addTodoItem(todoItem, user);
-        }
-        return error("Cannot retrieve user");
-    }
-
-    # A resource to get todo list
-    # + return - todo list which includes todo items
-    resource function get todosv2() returns ToDoObject[] | error {
-        return getTodosV2();
-    }
-
-    # A resource to add new todo item to todo list
-    # + return - todo list which includes todo items
-    resource function post todov2(@http:Payload ToDo todoItem) returns ToDoObject[]|error {
-        return addTodoItemV2(todoItem);
-    }
-
-    # A resource to get todo list
-    # + return - todo list which includes todo items
-    resource function get todosv1() returns ToDoObject[] {
-        // Send a response back to the caller.
-        return todoList;
-    }
-
-    resource function post todov1(@http:Payload ToDo todoItem) returns ToDoObject[] {
-        todoList.push({id: uuid:createType1AsString(), text: todoItem.text, isDone: todoItem.isDone});
-        return todoList;
+    resource function post todo(@http:Payload ToDo todoItem) returns ToDoObject[]|error {
+        return addTodoItem(todoItem);
     }
 }
