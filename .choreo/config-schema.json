@@ -23,17 +23,6 @@
             "database": {
               "type": "string",
               "description": ""
-            },
-            "authIssuer": {
-              "type": "string",
-              "description": ""
-            },
-            "authAudience": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "description": ""
             }
           },
           "additionalProperties": false,
@@ -41,9 +30,7 @@
             "dbHost",
             "dbUser",
             "dbPassword",
-            "database",
-            "authIssuer",
-            "authAudience"
+            "database"
           ]
         }
       },
