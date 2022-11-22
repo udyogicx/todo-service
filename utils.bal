@@ -18,21 +18,8 @@ configurable string dbUser = ?;
 configurable string dbPassword = ?;
 configurable string database = ?;
 
-configurable string authIssuer = ?;
-configurable string[] authAudience = ?;
-
 function getUser(string authHeader) returns string?|error {
   [jwt:Header, jwt:Payload] [_, payload] = check jwt:decode(authHeader);
-  return payload.sub;
-}
-
-function validateUser(string authHeader) returns string?|error {
-  jwt:ValidatorConfig validatorConfig = {
-    issuer: authIssuer,
-    audience: authAudience,
-    clockSkew: 60
-  };
-  jwt:Payload payload = check jwt:validate(authHeader, validatorConfig);
   return payload.sub;
 }
 

@@ -7,33 +7,19 @@ ToDoObject[] todoList = [{id: "1", text: "This is a sampe todo", isDone: false}]
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-@http:ServiceConfig {
-    cors: {
-        allowHeaders: ["x-authorization"],
-        allowCredentials: true
-    }
-}
 service / on new http:Listener(9090) {
     # A resource to get todo list
     # + return - todo list which includes todo items
-    resource function get todos(@http:Header {name: "x-authorization"} string authHeader) returns ToDoObject[] | error {
-        string?|error user = validateUser(authHeader);
-        if (user is string) {
-            log:printInfo(string `User ${user} is accessing the function GET todos.`);
-            return getTodos(user);
-        }
-        return error("Cannot retrieve user, error: ", user);
+    resource function get todos/user/[string user]() returns ToDoObject[] | error {
+        log:printInfo(string `User ${user} is accessing the function GET todos.`);
+        return getTodos(user);
     }
 
     # A resource to add new todo item to todo list
     # + return - todo list which includes todo items
-    resource function post todo(@http:Payload ToDo todoItem, @http:Header {name: "x-authorization"} string authHeader) returns ToDoObject[]|error {
-        string?|error user = validateUser(authHeader);
-        if (user is string) {
-            log:printInfo(string `User ${user} is accessing the function POST todo.`);
-            return addTodoItem(todoItem, user);
-        }
-        return error("Cannot retrieve user, error: ", user);
+    resource function post todo/user/[string user](@http:Payload ToDo todoItem) returns ToDoObject[]|error {
+        log:printInfo(string `User ${user} is accessing the function POST todo.`);
+        return addTodoItem(todoItem, user);
     }
 
     # A resource to get todo list
