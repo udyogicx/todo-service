@@ -6,6 +6,7 @@ import ballerina/jwt;
 type ToDo record {
   string text;
   boolean isDone;
+  boolean shared;
 };
 
 type ToDoObject record {
@@ -47,10 +48,10 @@ function getTodos(string userId) returns ToDoObject[] | error {
 
 function addTodoItem(ToDo todoItem, string userId) returns ToDoObject[]|error {
   mysql:Client dbClient = check new(
-    host="sql.freedb.tech",
-    user="freedb_id19870987_admin",
-    password="fgVtMvk6*mE8HjB", 
-    database="freedb_id19870987_todo",
+    host=dbHost,
+    user=dbUser,
+    password=dbPassword, 
+    database=database,
     connectionPool = { maxOpenConnections: 5 }
   );
   sql:ExecutionResult result = check dbClient->execute(`
@@ -64,6 +65,52 @@ function addTodoItem(ToDo todoItem, string userId) returns ToDoObject[]|error {
   } else {
     return error("Unable to obtain last insert ID");
   }
+}
+
+function updateTodoItem(ToDoObject todoItem, string userId) returns ToDoObject[]|error {
+  mysql:Client dbClient = check new(
+    host=dbHost,
+    user=dbUser,
+    password=dbPassword, 
+    database=database,
+    connectionPool = { maxOpenConnections: 5 }
+  );
+  sql:ExecutionResult result = check dbClient->execute(`
+    UPDATE todoitems SET
+      text = ${todoItem.text}, 
+      isDone = ${todoItem.isDone},
+      shared = ${todoItem.shared}
+    WHERE id = ${todoItem.id} AND user = ${userId}
+  `);
+  int|string? affectedRowCount = result.affectedRowCount;
+  check dbClient.close();
+  if affectedRowCount == 1 {
+    return getTodos(userId);
+  } else {
+    return error("Unable to obtain last insert ID");
+  }
+}
+
+function getSharedTodos() returns ToDoObject[] | error {
+  mysql:Client dbClient = check new(
+    host=dbHost,
+    user=dbUser,
+    password=dbPassword, 
+    database=database,
+    connectionPool = { maxOpenConnections: 5 }
+  );
+  ToDoObject[] todoItems = [];
+  stream<ToDoObject, sql:Error?> resultStream = dbClient->query(
+    `SELECT * FROM todoitems WHERE shared = true`
+  );
+  check from ToDoObject todoObject in resultStream
+  do {
+    todoItems.push(todoObject);
+  };
+  check resultStream.close();
+  check dbClient.close();
+  // Send a response back to the caller.
+  return todoItems;
 }
 
 function getTodosV2() returns ToDoObject[] | error {

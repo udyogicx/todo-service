@@ -3,7 +3,7 @@ import ballerinax/mysql.driver as _;
 import ballerina/log;
 import ballerina/uuid;
 
-ToDoObject[] todoList = [{id: "1", text: "This is a sampe todo", isDone: false}];
+ToDoObject[] todoList = [{id: "1", text: "This is a sampe todo", isDone: false, shared: false}];
 
 # A service representing a network-accessible API
 # bound to port `9090`.
@@ -20,6 +20,18 @@ service / on new http:Listener(9090) {
     resource function post todo/user/[string user](@http:Payload ToDo todoItem) returns ToDoObject[]|error {
         log:printInfo(string `User ${user} is accessing the function POST todo.`);
         return addTodoItem(todoItem, user);
+    }
+
+    # A resource to update an exisiting todo item in todo list
+    # + return - todo list which includes todo items
+    resource function put todo/user/[string user](@http:Payload ToDoObject todoItem) returns ToDoObject[]|error {
+        log:printInfo(string `User ${user} is accessing the function PUT todo.`);
+        return updateTodoItem(todoItem, user);
+    }
+
+    resource function get todos/shared() returns ToDoObject[] | error {
+        log:printInfo(string `Accessing the function GET todos/shared.`);
+        return getSharedTodos();
     }
 
     # A resource to get todo list
@@ -64,7 +76,7 @@ service / on new http:Listener(9090) {
     }
 
     resource function post todov1(@http:Payload ToDo todoItem) returns ToDoObject[] {
-        todoList.push({id: uuid:createType1AsString(), text: todoItem.text, isDone: todoItem.isDone});
+        todoList.push({id: uuid:createType1AsString(), text: todoItem.text, isDone: todoItem.isDone, shared: todoItem.shared});
         return todoList;
     }
 }
