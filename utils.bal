@@ -55,8 +55,8 @@ function addTodoItem(ToDo todoItem, string userId) returns ToDoObject[]|error {
     connectionPool = { maxOpenConnections: 5 }
   );
   sql:ExecutionResult result = check dbClient->execute(`
-    INSERT INTO todoitems (id, text, isDone, user)
-    VALUES (${uuid:createType1AsString()}, ${todoItem.text}, ${todoItem.isDone}, ${userId})
+    INSERT INTO todoitems (id, text, isDone, user, shared)
+    VALUES (${uuid:createType1AsString()}, ${todoItem.text}, ${todoItem.isDone}, ${userId}, ${todoItem.shared})
   `);
   int|string? affectedRowCount = result.affectedRowCount;
   check dbClient.close();
