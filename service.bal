@@ -7,18 +7,6 @@ ToDoObject[] todoList = [{id: "1", text: "This is a sampe todo", isDone: false, 
 
 # A service representing a network-accessible API
 # bound to port `9090`.
-@http:ServiceConfig {
-    auth: [
-        {
-            jwtValidatorConfig: {
-                issuer: "https://sts.choreo.dev:443/oauth2/token",
-                audience: "74V5sajPmUVrN3oFunZYfMFlX74a",
-                scopeKey: "scope"
-            },
-            scopes: ["default"]
-        }
-    ]
-}
 service / on new http:Listener(9090) {
     # A resource to get todo list
     # + return - todo list which includes todo items
@@ -41,7 +29,8 @@ service / on new http:Listener(9090) {
         return updateTodoItem(todoItem, user);
     }
 
-    resource function get todos/shared() returns ToDoObject[] | error {
+    resource function get todos/shared(@http:Header {name: "custom-auth-header"} string authHeader) returns ToDoObject[] | error {
+        log:printInfo(string `Auth header: ${authHeader}`);
         log:printInfo(string `Accessing the function GET todos/shared.`);
         return getSharedTodos();
     }
