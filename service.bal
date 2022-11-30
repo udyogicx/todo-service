@@ -35,7 +35,7 @@ service / on new http:Listener(9090) {
             log:printInfo(string `Authorized user ${user} is accessing the function GET todos/shared.`);
             return getSharedTodos();
         }
-        return error(string `User ${user} is not authorized.`);
+        return error("Unauthorized", message = string `User ${user} is not authorized.`, code = 401);
     }
 
     # A resource to get todo list
