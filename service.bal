@@ -29,15 +29,13 @@ service / on new http:Listener(9090) {
         return updateTodoItem(todoItem, user);
     }
 
-    @http:ResourceConfig {
-        cors: {
-            allowHeaders: ["custom-auth-header"]
+    resource function get todos/shared/user/[string user]() returns ToDoObject[] | error {
+        boolean|error isAuthUser = checkAuthUser(user);
+        if (isAuthUser == true) {
+            log:printInfo(string `Authorized user ${user} is accessing the function GET todos/shared.`);
+            return getSharedTodos();
         }
-    }
-    resource function get todos/shared(@http:Header {name: "custom-auth-header"} string authHeader) returns ToDoObject[] | error {
-        log:printInfo(string `Auth header: ${authHeader}`);
-        log:printInfo(string `Accessing the function GET todos/shared.`);
-        return getSharedTodos();
+        return error(string `User ${user} is not authorized.`);
     }
 
     # A resource to get todo list

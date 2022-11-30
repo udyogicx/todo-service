@@ -2,6 +2,7 @@ import ballerinax/mysql;
 import ballerina/sql;
 import ballerina/uuid;
 import ballerina/jwt;
+import ballerina/regex;
 
 type ToDo record {
   string text;
@@ -14,6 +15,10 @@ type ToDoObject record {
   string id;
 };
 
+type UserScopes record {
+  string scopes;
+};
+
 configurable string dbHost = ?;
 configurable string dbUser = ?;
 configurable string dbPassword = ?;
@@ -22,6 +27,24 @@ configurable string database = ?;
 function getUser(string authHeader) returns string?|error {
   [jwt:Header, jwt:Payload] [_, payload] = check jwt:decode(authHeader);
   return payload.sub;
+}
+
+function checkAuthUser(string userId) returns boolean | error {
+  mysql:Client dbClient = check new(
+    host=dbHost,
+    user=dbUser,
+    password=dbPassword, 
+    database=database,
+    connectionPool = { maxOpenConnections: 5 }
+  );
+  UserScopes userScopes = check dbClient->queryRow(
+    `SELECT scopes FROM userscopes WHERE user = ${userId}`
+  );
+  string[] scopes = regex:split(userScopes.scopes, ",");
+  check dbClient.close();
+  return scopes.indexOf("user") != () || scopes.indexOf("admin") != ();
+  // return scopes;
+  // return ["admin", "user"];
 }
 
 function getTodos(string userId) returns ToDoObject[] | error {
