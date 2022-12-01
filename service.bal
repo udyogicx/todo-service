@@ -29,7 +29,8 @@ service / on new http:Listener(9090) {
         return updateTodoItem(todoItem, user);
     }
 
-    resource function get todos/shared/user/[string user]() returns ToDoObject[] | error {
+    resource function get todos/shared/user/[string user](@http:Header {name: "X-JWT-Assertion"} string authHeader) returns ToDoObject[] | error {
+        log:printInfo(string `X-JWT-Assertion: ${authHeader}`);
         boolean|error isAuthUser = checkAuthUser(user);
         if (isAuthUser == true) {
             log:printInfo(string `Authorized user ${user} is accessing the function GET todos/shared.`);
